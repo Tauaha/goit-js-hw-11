@@ -45,10 +45,7 @@ if(imageApiService.searchQuery === ''){
 //   counteraHide();
 //  return;
 // };
-// if((allImages.totalHits - imageApiService.perPage * (imageApiService.page - 1)) > 0) {
-//   counterActive();
-//   counter.innerHTML = `Ми знайшли для вас ще ${allImages.totalHits - imageApiService.perPage * (imageApiService.page - 1)}  зображень`;
-// }
+//
 };
 
 
