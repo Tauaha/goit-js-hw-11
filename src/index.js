@@ -23,23 +23,24 @@ const lightbox =  new SimpleLightbox('.gallery a', {
 
  async function onSearch(e){
 e.preventDefault();
-
+clearImageList();
 imageApiService.searchQuery = e.currentTarget.elements.searchQuery.value;
 
 if(imageApiService.searchQuery === ''){
   Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
 }else{
   imageApiService.resetPage();
-  clearImageList();
+ // clearImageList();
   loadBtn.classList.add('is-hidden');
   const allImages = await imageApiService.fetchImage().then(data => {
     createImage(data.hits);
+    loadBtn.classList.remove('is-hidden');
     Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
   if(data.totalHits < imageApiService.perPage){
     LoadBtnHide();
     return;
   }
-  loadBtn.classList.remove('is-hidden');
+  
   });
  
 }
