@@ -9,7 +9,6 @@ const form = document.querySelector('#search-form');
 const divRender = document.querySelector('.gallery');
 const loadBtn = document.querySelector('.load-more');
 form.addEventListener('submit', onSearch);
-const counter = document.querySelector('.img-counter');
 loadBtn.addEventListener('click', onLoadMore);
 
 
@@ -25,7 +24,6 @@ const lightbox =  new SimpleLightbox('.gallery a', {
  async function onSearch(e){
 e.preventDefault();
 
-//clearImageList();
 imageApiService.searchQuery = e.currentTarget.elements.searchQuery.value;
 
 if(imageApiService.searchQuery === ''){
@@ -34,46 +32,37 @@ if(imageApiService.searchQuery === ''){
   imageApiService.resetPage();
   clearImageList();
   loadBtn.classList.add('is-hidden');
-  const allImages = await imageApiService.fetchImage().then(createImage);
+  const allImages = await imageApiService.fetchImage().then(data => {
+    createImage(data.hits);
+    Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+  if(data.totalHits < imageApiService.perPage){
+    LoadBtnHide();
+    return;
+  }
   loadBtn.classList.remove('is-hidden');
-  
+  });
+ 
 }
-
-// if(imageApiService.page > Math.ceil(Number({totalHits} / imageApiService.perPage)) ) {
-//   Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
-//   LoadMoreBtnHide();
-//   counteraHide();
-//  return;
-// };
-//
 };
 
 
 async function onLoadMore(){
 
-   const allImages = await imageApiService.fetchImage().then(createImage);
-    // console.log(imageApiService.page);
-    // console.log(totalHits);
-    // if(imageApiService.page > Math.ceil(Number(allImages.totalHits / imageApiService.perPage)) ) {
-    //   Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
-    //   LoadMoreBtnHide();
-    //   counteraHide();
-    //  return}
-    
-       
-  
+   const allImages = await imageApiService.fetchImage().then(data => {
+    createImage(data.hits);
+    if(imageApiService.page > Math.ceil(Number(data.totalHits / imageApiService.perPage)) ) {
+      Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
+      LoadBtnHide();
+     return
+    }
+   });
 }
    
-function counterActive() {
-  counter.style.display = "block";
-}
-function counteraHide() {
-  counter.style.display = "none";
-}
-function LoadMoreBtnHide() {
+function LoadBtnHide() {
   loadBtn.style.display = "none";
 }
-function createImage({hits}){
+
+function createImage(hits){
      const markup = hits.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => {return `<div class="photo-card">
      <a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" width="370" /></a>
      <div class="info">
